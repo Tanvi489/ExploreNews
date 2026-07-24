@@ -12,20 +12,19 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
-      with:
-        python-version: '3.10'
-
-    - name: Install Dependencies
-      run: pip install feedparser gspread oauth2client
+      - name: Install Dependencies
+        run: pip install feedparser gspread oauth2client
 
       - name: Create Google Credentials File
-  run: |
-    echo '${{ secrets.GOOGLE_CREDS }}' > google_creds.json
+        run: |
+          echo '${{ secrets.GOOGLE_CREDS }}' > google_creds.json
 
-    - name: Execute Extraction Pipeline
-      run: python fetch_news.py
+      - name: Execute Extraction Pipeline
+        run: python fetch_news.py
