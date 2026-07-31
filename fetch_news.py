@@ -32,12 +32,17 @@ for url in rss_urls:
 
         if entry.link not in existing_urls:
 
-            sh.append_row([
-                entry.title,
-                entry.link,
-                "",
-                "",
-                "Draft"
-            ])
+            print("Processing:", entry.title)
 
+            summary = entry.get("summary", entry.get("description", ""))
+
+            sh.append_row([
+    entry.title,
+    entry.link,
+    summary,
+    "",
+    "Draft"
+])
+
+print("Added:", entry.title)
 print("Done")
