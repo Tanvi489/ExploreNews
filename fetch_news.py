@@ -1,5 +1,7 @@
 import feedparser
 import gspread
+import re
+import time
 
 gc = gspread.service_account(filename='google_creds.json')
 
@@ -25,7 +27,23 @@ existing_urls = sh.col_values(2)
 
 print("Starting...")
 
+def get_tags(title):
+    keywords = ["exam", "admission", "student", "school", "college", "university",
+                "education", "neet", "jee", "ugc", "ai", "scholarship"]
+
+    tags = []
+
+    for word in keywords:
+        if word.lower() in title.lower():
+            tags.append(word.title())
+
+    if not tags:
+        tags.append("Education")
+
+    return ", ".join(tags[:5])
+
 for url in rss_urls:
+
     feed = feedparser.parse(url)
 
     for entry in feed.entries:
@@ -34,15 +52,28 @@ for url in rss_urls:
 
             print("Processing:", entry.title)
 
-            summary = entry.get("summary", entry.get("description", ""))
+            summary = re.sub("<.*?>", "", entry.get("summary", entry.get("description", "")))
 
-            sh.append_row([
-    entry.title,
-    entry.link,
-    summary,
-    "",
-    "Draft"
-])
+            tags = get_tags(entry.title)
 
-print("Added:", entry.title)
+            try:
+
+                sh.append_row([
+                    entry.title,
+                    entry.link,
+                    summary,
+                    tags,
+                    "Draft"
+                ])
+
+                existing_urls.append(entry.link)
+
+                print("Added:", entry.title)
+
+                time.sleep(2)
+
+            except Exception as e:
+
+                print("Error:", e)
+
 print("Done")
